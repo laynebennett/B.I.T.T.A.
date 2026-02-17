@@ -9,6 +9,9 @@ bool atDoor;
 int state;
 BLEScan* pBLEScan;
 #define IR_PIN 13
+#define LAYNE_TAG 1
+#define JACOB_TAG 1
+#define CONNOR_TAG 1
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks 
 {
@@ -37,6 +40,8 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks
         Serial.print(d[i], HEX);
       }
 
+      Serial.println("");
+
       uint16_t major = (d[20] << 8) | d[21];
       uint16_t minor = (d[22] << 8) | d[23];
       int rssi = advertisedDevice.getRSSI();
@@ -48,7 +53,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks
 
       Serial.printf("Major: %d  Minor: %d RSSI: %d  Tx Power: %d dBm  Distance: %lf m\n", major, minor, rssi, txPower, distance);
 
-      if(state == HIGH){
+      if(state == HIGH){//Door open
         if(distance<5.0){
           if(atDoor==false){
             Serial.println("User is at door. Play Sound");
@@ -56,7 +61,7 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks
           }
           atDoor = true;
         }
-      }else{
+      }else{//Door closed
         atDoor = false;
       }
 
