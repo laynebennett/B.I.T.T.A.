@@ -5,13 +5,17 @@
 #include <BLEScan.h>              // contains BLE scanning functions
 #include <BLEAdvertisedDevice.h>  // contains BLE device characteristic data
 int scanTime = 1; //In seconds
+int cooldown = 0; //Cooldown in seconds
 bool atDoor;
 int state;
+bool layneAtDoor = false;
+bool jacobAtDoor = false;
+bool connorAtDoor = false;
 BLEScan* pBLEScan;
 #define IR_PIN 13
 #define LAYNE_TAG 1
-#define JACOB_TAG 1
-#define CONNOR_TAG 1
+#define JACOB_TAG 2
+#define CONNOR_TAG 3
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks 
 {
@@ -50,14 +54,18 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks
       double exp = ((double)txPower-(double)rssi)/(20.0);
 
       double distance = pow(10, exp);
+      
 
       Serial.printf("Major: %d  Minor: %d RSSI: %d  Tx Power: %d dBm  Distance: %lf m\n", major, minor, rssi, txPower, distance);
 
-      if(state == HIGH){//Door open
+      //TODO: CHECK IF COOLDOWN WORKS AS EXPECTED. IT SHOULD SINCE THE SCAN EXECUTES FIRST BEFORE COOLDOWN IS SET?
+      if((state == HIGH)&&(cooldown <= 0)){//Door open
         if(distance<5.0){
-          if(atDoor==false){
+          if(atDoor==false){ //TODO: CHANGE FROM GLOBAL ATDOOR
             Serial.println("User is at door. Play Sound");
-            Serial2.write('a');
+            if(major == 1){
+              layneAtDoor = true;
+            }
           }
           atDoor = true;
         }
@@ -88,7 +96,26 @@ void loop() {
   } else {
     Serial.println("Door open");
   }
-  BLEScanResults * foundDevices = pBLEScan->start(scanTime, false);
+  if(cooldown>0){
+    cooldown--;
+  }
+  BLEScanResults * foundDevices = pBLEScan->start(scanTime, false); //Thought: scan only when door open??? Will test feasibility later
+  if(layneAtDoor == true){
+    Serial2.write('1');//TODO: change activation phrase later
+    cooldown = 10*(1.0/((double)scanTime)); //set cooldown in seconds
+    layneAtDoor = false;
+  }else if(jacobAtDoor == true){
+    Serial2.write('2');
+    cooldown = 10*(1.0/((double)scanTime)); //set cooldown in seconds
+    jacobAtDoor = false;
+  }else if(connorAtDoor == true){
+    Serial2.write('3');
+    cooldown = 10*(1.0/((double)scanTime)); //set cooldown in seconds
+    connorAtDoor = false;
+  }else if(state == HIGH){
+    Serial2.write('x');
+    cooldown = 10*(1.0/((double)scanTime)); //set cooldown in seconds
+  }
   //Serial.print("Devices found: ");
   //Serial.println(foundDevices->getCount());
   Serial.println("Scan done!");

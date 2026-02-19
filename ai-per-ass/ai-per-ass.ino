@@ -38,6 +38,16 @@ bool downloadFile(const char* url, const char* path) {
             delay(1);
         }
         Serial.printf("Downloaded: %d bytes\n", total);
+
+        // Check memory usage
+        size_t totalBytes = SPIFFS.totalBytes();
+        size_t used  = SPIFFS.usedBytes();
+        size_t free  = totalBytes - used;
+
+        Serial.printf("Total: %d bytes\n", totalBytes);
+        Serial.printf("Used:  %d bytes\n", used);
+        Serial.printf("Free:  %d bytes\n", free);
+        
         file.close();
         http.end();
         return true;
