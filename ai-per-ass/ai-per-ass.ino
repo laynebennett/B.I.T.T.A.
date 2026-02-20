@@ -194,8 +194,21 @@ void loop() {
     while (Serial2.available()) {
         char c = Serial2.read();
         //Serial.printf("%c\n", c);
-        if (c == 'a') {
-            Serial.println("Trigger received!");
+        if (c == '1') {
+            Serial.println("Layne trigger received!");
+            filePath = "/layneResponse.wav";
+            handlePlay();
+        } else if (c == '2') {
+            Serial.println("Jacob trigger received!");
+            filePath = "/jacobResponse.wav";
+            handlePlay();
+        } else if (c == '3') {
+            Serial.println("Connor trigger received!");
+            filePath = "/connorResponse.wav";
+            handlePlay();
+        } else if (c == 'x') {
+            Serial.println("Intruder trigger received!");
+            filePath = "/intruderResponse.wav";
             handlePlay();
         }
   }
