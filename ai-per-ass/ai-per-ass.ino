@@ -4,8 +4,8 @@
 #include <WebServer.h>
 #include "BluetoothA2DPSource.h"
 
-const char* ssid = "TP-Link_9BB8";
-const char* password = "Perchance...";
+const char* ssid = "SSID";
+const char* password = "PASSWORD";
 const char* fileURL  = "http://192.168.0.103:8080/response.wav";
 const char* filePath = "/response.wav";
 const char* btDeviceName = "JBL Flip 4";
